@@ -1,0 +1,8 @@
+{
+    "ip": "0.0.0.0",
+    "port": 80,
+    "video": {
+        "video_server_timeout": 60,
+        "get_info_interval": 10
+    }
+}
