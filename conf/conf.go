@@ -23,6 +23,7 @@ type Config struct {
 }
 
 type VideoConfig struct {
+	LisentAddr         string        `json:"listen_addr"`
 	VideoServerTimeout time.Duration `json:"video_server_timeout"`
 	GetInfoInterval    time.Duration `json:"get_info_interval"`
 }

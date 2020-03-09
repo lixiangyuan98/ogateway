@@ -168,9 +168,9 @@ type server struct {
 
 var svr *server
 
-func Init() {
+func Init(listenAddr string) {
 	svr = &server{}
-	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:8000")
+	addr, err := net.ResolveTCPAddr("tcp", listenAddr)
 	if err != nil {
 		log.Printf("resolve addr error: %v\n", err)
 		return
@@ -188,6 +188,7 @@ func Init() {
 			log.Printf("close server error: %v\n", err)
 		}
 	}()
+	log.Printf("module Video start listening on %v\n", listenAddr)
 
 	conns := &sync.Map{}
 	for _, c := range conf.VideoConf {

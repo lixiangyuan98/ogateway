@@ -23,7 +23,7 @@ func main() {
 func init() {
 	conf.Init()
 	// 启动和视频采集端的通信
-	go video.Init()
+	go video.Init(conf.GlobalConf.VideoConf.LisentAddr)
 }
 
 func loginMiddleware(ctx *gin.Context) {
