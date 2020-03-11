@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -54,6 +55,7 @@ func ConnectVideoServer(ctx *gin.Context) {
 		return
 	}
 	defer ws.Close()
+	mu := &sync.Mutex{}
 
 	closed := make(chan struct{})
 	timer := time.NewTimer(conf.GlobalConf.VideoConf.GetInfoInterval)
@@ -73,7 +75,9 @@ func ConnectVideoServer(ctx *gin.Context) {
 				return
 			case <-timer.C:
 				servers := video.GetInfo(hosts)
+				mu.Lock()
 				util.WriteJson(ws, 0, "info", servers)
+				mu.Unlock()
 				timer.Reset(conf.GlobalConf.VideoConf.GetInfoInterval)
 			}
 		}
@@ -88,14 +92,20 @@ func ConnectVideoServer(ctx *gin.Context) {
 		v := model.VideoSendRequest{}
 		if err := json.Unmarshal(message, &v); err != nil {
 			log.Printf("resolve VideoSendRequest error: %v\n", err)
+			mu.Lock()
 			util.WriteNil(ws, -201, "invalid request")
+			mu.Unlock()
 			continue
 		}
 		port := strconv.FormatInt(int64(v.Port), 10)
 		if err := video.Send(v.Method, v.Host, v.Src, v.Dest, port); err != nil {
+			mu.Lock()
 			util.WriteNil(ws, -300, err.Error())
+			mu.Unlock()
 			continue
 		}
+		mu.Lock()
 		util.WriteNil(ws, 0, "ok")
+		mu.Unlock()
 	}
 }
