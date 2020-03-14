@@ -54,7 +54,10 @@ func ConnectVideoServer(ctx *gin.Context) {
 		log.Printf("upgrade to websocket error: %v\n", err)
 		return
 	}
-	defer ws.Close()
+	defer func() {
+		log.Printf("ws closed by remote\n")
+		ws.Close()
+	}()
 	mu := &sync.Mutex{}
 
 	closed := make(chan struct{})
