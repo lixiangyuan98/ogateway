@@ -42,7 +42,7 @@ func TestWebsocket(t *testing.T) {
 	}()
 
 	timer := time.NewTimer(time.Second * 50)
-	interval := time.NewTimer(time.Second * 10)
+	interval := time.NewTimer(0)
 
 	for {
 		select {
@@ -51,11 +51,11 @@ func TestWebsocket(t *testing.T) {
 			return
 		case <-interval.C:
 			m, _ := json.Marshal(model.VideoSendRequest{
-				Method: "Send",
+				Method: "SEND",
 				Host:   "127.0.0.1",
-				Src:    "1.mov",
-				Dest:   "127.0.0.1",
-				Port:   9999,
+				Src:    "1.264",
+				Dest:   "192.168.56.1",
+				Port:   9000,
 			})
 			err := conn.WriteMessage(websocket.TextMessage, m)
 			if err != nil {

@@ -25,29 +25,6 @@ var (
 	}
 )
 
-func Send(ctx *gin.Context) {
-	req := &model.VideoSendRequest{}
-	if err := ctx.Bind(req); err != nil {
-		log.Printf("bind error: %v", err)
-		ctx.JSON(400, gin.H{
-			"message": "invalid parameter",
-		})
-		return
-	}
-	port := strconv.FormatInt(int64(req.Port), 10)
-	err := video.Send(req.Method, req.Host, req.Src, req.Dest, port)
-	if err != nil {
-		log.Printf("send error: %v", err)
-		ctx.JSON(400, gin.H{
-			"message": "send error",
-		})
-		return
-	}
-	ctx.JSON(200, gin.H{
-		"message": "ok",
-	})
-}
-
 func ConnectVideoServer(ctx *gin.Context) {
 	ws, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
@@ -61,7 +38,7 @@ func ConnectVideoServer(ctx *gin.Context) {
 	mu := &sync.Mutex{}
 
 	closed := make(chan struct{})
-	timer := time.NewTimer(conf.GlobalConf.VideoConf.GetInfoInterval)
+	timer := time.NewTimer(0)
 	user, _ := ctx.Get("user")
 	hosts := make([]string, 0)
 	for _, host := range conf.VideoConf {
@@ -94,7 +71,7 @@ func ConnectVideoServer(ctx *gin.Context) {
 		}
 		v := model.VideoSendRequest{}
 		if err := json.Unmarshal(message, &v); err != nil {
-			log.Printf("resolve VideoSendRequest error: %v\n", err)
+			log.Printf("resolve VideoSendRequest error: %v, message: %v\n", err, string(message))
 			mu.Lock()
 			util.WriteNil(ws, -201, "invalid request")
 			mu.Unlock()

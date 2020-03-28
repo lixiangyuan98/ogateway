@@ -15,7 +15,6 @@ import (
 func main() {
 	r := gin.Default()
 	r.Use(loginMiddleware)
-	r.POST("/send", handler.Send)
 	r.GET("/ws", handler.ConnectVideoServer)
 	r.Run(fmt.Sprintf("%v:%v", conf.GlobalConf.IP, conf.GlobalConf.Port))
 }

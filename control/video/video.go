@@ -63,9 +63,9 @@ func newReport(b []byte) *report {
 
 // 视频采集端
 type VideoServer struct {
-	Host   string
-	Status string
-	Files  []string
+	Host   string   `json:"host"`
+	Status string   `json:"status"`
+	Files  []string `json:"files"`
 }
 
 func newVideoServer(host, status string, files []string) *VideoServer {
