@@ -47,11 +47,17 @@ func ConnectVideoServer(ctx *gin.Context) {
 		}
 	}
 
+	var lastHost string
+	var lastDest string
+	var lastPort string
 	go func() {
 		for {
 			select {
 			case <-closed:
 				log.Printf("close ws://%v\n", ws.RemoteAddr().String())
+				if err := video.Send("STOP", lastHost, "", lastDest, lastPort); err != nil {
+					log.Printf("send STOP error: %v\n", err)
+				}
 				return
 			case <-timer.C:
 				servers := video.GetInfo(hosts)
@@ -78,6 +84,9 @@ func ConnectVideoServer(ctx *gin.Context) {
 			continue
 		}
 		port := strconv.FormatInt(int64(v.Port), 10)
+		lastHost = v.Host
+		lastDest = v.Dest
+		lastPort = port
 		if err := video.Send(v.Method, v.Host, v.Src, v.Dest, port); err != nil {
 			mu.Lock()
 			util.WriteNil(ws, -300, err.Error())

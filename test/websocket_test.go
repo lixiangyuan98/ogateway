@@ -53,9 +53,9 @@ func TestWebsocket(t *testing.T) {
 			m, _ := json.Marshal(model.VideoSendRequest{
 				Method: "SEND",
 				Host:   "127.0.0.1",
-				Src:    "1.264",
+				Src:    "",
 				Dest:   "192.168.56.1",
-				Port:   9000,
+				Port:   9999,
 			})
 			err := conn.WriteMessage(websocket.TextMessage, m)
 			if err != nil {
