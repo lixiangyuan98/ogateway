@@ -63,13 +63,15 @@ func newReport(b []byte) *report {
 
 // 视频采集端
 type VideoServer struct {
+	Name   string   `json:"name"`
 	Host   string   `json:"host"`
 	Status string   `json:"status"`
 	Files  []string `json:"files"`
 }
 
-func newVideoServer(host, status string, files []string) *VideoServer {
+func newVideoServer(name, host, status string, files []string) *VideoServer {
 	return &VideoServer{
+		Name:   name,
 		Host:   host,
 		Status: status,
 		Files:  files,
@@ -111,7 +113,7 @@ func (c *connection) recv(b []byte) {
 	r := newReport(b)
 	log.Printf("recv report from %v: %v\n", c.getHost(), r)
 	c.mu.Lock()
-	c.client = newVideoServer(c.getAddr(), r.status, r.files)
+	c.client = newVideoServer(c.client.Name, c.getAddr(), r.status, r.files)
 	c.mu.Unlock()
 }
 
@@ -194,7 +196,7 @@ func Init(listenAddr string) {
 	for _, c := range conf.VideoConf {
 		conns.Store(c.Host, &connection{
 			mu:     sync.Mutex{},
-			client: newVideoServer(c.Host, "inactive", make([]string, 0)),
+			client: newVideoServer(c.Name, c.Host, "inactive", make([]string, 0)),
 		})
 	}
 	svr.conns = conns

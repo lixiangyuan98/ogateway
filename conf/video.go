@@ -5,6 +5,7 @@ var (
 )
 
 type VideoServer struct {
+	Name  string `json:"name" binding:"required"`
 	Host  string `json:"host" binding:"required"`
 	Group string `json:"group" binding:"required"`
 }
